@@ -26,26 +26,19 @@
     <div class="bar wealth" id="bar-wealth"><div class="text-wrapper" id="wealth"></div></div>
     <img id="img-wealth" src="value_images/markets.svg" height="128pt"/>
 </div>
-<h2>Diplomatic Axis: <span class="weight-300" id="diplomatic-label"></span></h2>
+<h2>Philosophical Axis: <span class="weight-300" id="phil-label"></span></h2>
 <div class="axis">
-    <img id="img-might" src="value_images/nation.svg" height="128pt"/>
-    <div class="bar might" id="bar-might"><div class="text-wrapper" id="might"></div></div>
-    <div class="bar peace" id="bar-peace"><div class="text-wrapper" id="peace"></div></div>
-    <img id="img-peace" src="value_images/globe.svg" height="128pt"/>
+    <img id="img-phil1" src="value_images/liberty.svg" height="128pt"/>
+    <div class="bar phil1" id="bar-phil1"><div class="text-wrapper" id="phil1"></div></div>
+    <div class="bar phil2" id="bar-phil2"><div class="text-wrapper" id="phil2"></div></div>
+    <img id="img-phil2" src="value_images/authority.svg" height="128pt"/>
 </div>
-<h2>Civil Axis: <span class="weight-300" id="state-label"></span></h2>
+<h2>Progressive Axis: <span class="weight-300" id="prog-label"></span></h2>
 <div class="axis">
-    <img id="img-liberty" src="value_images/liberty.svg" height="128pt"/>
-    <div class="bar liberty" id="bar-liberty"><div class="text-wrapper" id="liberty"></div></div>
-    <div class="bar authority" id="bar-authority"><div class="text-wrapper" id="authority"></div></div>
-    <img id="img-authority" src="value_images/authority.svg" height="128pt"/>
-</div>
-<h2>Societal Axis: <span class="weight-300" id="society-label"></span></h2>
-<div class="axis">
-    <img id="img-tradition" src="value_images/tradition.svg" height="128pt"/>
-    <div class="bar tradition" id="bar-tradition"><div class="text-wrapper" id="tradition"></div></div>
-    <div class="bar progress" id="bar-progress"><div class="text-wrapper" id="progress"></div></div>
-    <img id="img-progress" src="value_images/progress.svg" height="128pt"/>
+    <img id="img-prog1" src="value_images/progress.svg" height="128pt"/>
+    <div class="bar prog1" id="bar-prog1"><div class="text-wrapper" id="prog1"></div></div>
+    <div class="bar prog2" id="bar-prog2"><div class="text-wrapper" id="prog2"></div></div>
+    <img id="img-prog2" src="value_images/tradition.svg" height="128pt"/>
 </div>
 <h2>Closest Match: <span class="weight-300" id="ideology-label"></span></h2>
 <p>Ideological matching is a work in progress, and is much less accurate than the values and axes.</p>
@@ -76,9 +69,8 @@
     }
 
     econArray = ["Communist","Socialist","Social","Centrist","Market","Capitalist","Laissez-Faire"]
-    diplArray = ["Cosmopolitan","Internationalist","Peaceful","Balanced","Patriotic","Nationalist","Chauvinist"]
-    govtArray = ["Anarchist","Libertarian","Liberal","Moderate","Statist","Authoritarian","Totalitarian"]
-    sctyArray = ["Revolutionary","Very Progressive","Progressive","Neutral","Traditional","Very Traditional","Reactionary"]
+    philArray = ["Materialist", "Determinist", "Rationalist", "Balanced", "Existentialist", "Idealist", "Spiritualist"]
+    progArray = ["Revolutionary","Very Progressive","Progressive","Neutral","Traditional","Very Traditional","Reactionary"]
 
     function setLabel(val,ary) {
         if (val > 100) { return "" } else
@@ -93,36 +85,35 @@
     }
 
     equality  = getQueryVariable("e")
-    peace     = getQueryVariable("d")
-    liberty   = getQueryVariable("g")
-    progress  = getQueryVariable("s")
+    phil      = getQueryVariable("p")
+    prog      = getQueryVariable("r")
+    
     wealth    = (100 - equality).toFixed(1)
-    might     = (100 - peace   ).toFixed(1)
-    authority = (100 - liberty ).toFixed(1)
-    tradition = (100 - progress).toFixed(1)
+    philOpp   = (100 - phil).toFixed(1)
+    progOpp   = (100 - prog).toFixed(1)
 
     setBarValue("equality", equality)
     setBarValue("wealth", wealth)
-    setBarValue("peace", peace)
-    setBarValue("might", might)
-    setBarValue("liberty", liberty)
-    setBarValue("authority", authority)
-    setBarValue("progress", progress)
-    setBarValue("tradition", tradition)
+
+    setBarValue("phil1", phil)
+    setBarValue("phil2", philOpp)
+
+    setBarValue("prog1", prog)
+    setBarValue("prog2", progOpp)
 
     document.getElementById("economic-label").innerHTML = setLabel(equality, econArray)
-    document.getElementById("diplomatic-label").innerHTML = setLabel(peace, diplArray)
-    document.getElementById("state-label").innerHTML = setLabel(liberty, govtArray)
-    document.getElementById("society-label").innerHTML = setLabel(progress, sctyArray)
+    document.getElementById("phil-label").innerHTML = setLabel(phil, philArray)
+    document.getElementById("prog-label").innerHTML = setLabel(prog, progArray)
 
     ideology = ""
     ideodist = Infinity
     for (var i = 0; i < ideologies.length; i++) {
         dist = 0
-        dist += Math.pow(Math.abs(ideologies[i].stats.econ - equality), 2)
-        dist += Math.pow(Math.abs(ideologies[i].stats.govt - liberty), 2)
-        dist += Math.pow(Math.abs(ideologies[i].stats.dipl - peace), 1.73856063)
-        dist += Math.pow(Math.abs(ideologies[i].stats.scty - progress), 1.73856063)
+        // Calculate Euclidean distance (or squared distance) for 3 axes
+        dist += Math.pow(Math.abs(ideologies[i].stats.economics - equality), 2)
+        dist += Math.pow(Math.abs(ideologies[i].stats.worldview - phil), 2)
+        dist += Math.pow(Math.abs(ideologies[i].stats.cultural - prog), 2)
+        
         if (dist < ideodist) {
             ideology = ideologies[i].name
             ideodist = dist
@@ -139,79 +130,67 @@
     }
 
     window.onload = function() {
-        var c = document.createElement("canvas")
-        var ctx = c.getContext("2d")
-        c.width = 800;
-        c.height = 650;
-        ctx.fillStyle = "#EEEEEE"
-        ctx.fillRect(0,0,800,650);
+    var c = document.createElement("canvas");
+    var ctx = c.getContext("2d");
+    c.width = 800;
+    c.height = 530;
 
-        img = document.getElementById("img-equality")
-        ctx.drawImage(img, 20, 170, 100, 100);
-        img = document.getElementById("img-wealth")
-        ctx.drawImage(img, 680, 170, 100, 100)
-        img = document.getElementById("img-might")
-        ctx.drawImage(img, 20, 290, 100, 100)
-        img = document.getElementById("img-peace")
-        ctx.drawImage(img, 680, 290, 100, 100)
-        img = document.getElementById("img-liberty")
-        ctx.drawImage(img, 20, 410, 100, 100)
-        img = document.getElementById("img-authority")
-        ctx.drawImage(img, 680, 410, 100, 100)
-        img = document.getElementById("img-tradition")
-        ctx.drawImage(img, 20, 530, 100, 100)
-        img = document.getElementById("img-progress")
-        ctx.drawImage(img, 680, 530, 100, 100)
+    // Background
+    ctx.fillStyle = "#EEEEEE";
+    ctx.fillRect(0, 0, 800, 530);
 
-        ctx.fillStyle="#222222"
-        ctx.fillRect(120, 180, 560, 80)
-        ctx.fillRect(120, 300, 560, 80)
-        ctx.fillRect(120, 420, 560, 80)
-        ctx.fillRect(120, 540, 560, 80)
-        ctx.fillStyle="#f44336"
-        ctx.fillRect(120, 184, 5.6*equality-2, 72)
-        ctx.fillStyle="#00897b"
-        ctx.fillRect(682-5.6*wealth, 184, 5.6*wealth-2, 72)
-        ctx.fillStyle="#ff9800"
-        ctx.fillRect(120, 304, 5.6*might-2, 72)
-        ctx.fillStyle="#03a9f4"
-        ctx.fillRect(682-5.6*peace, 304, 5.6*peace-2, 72)
-        ctx.fillStyle="#ffeb3b"
-        ctx.fillRect(120, 424, 5.6*liberty-2, 72)
-        ctx.fillStyle="#3f51b5"
-        ctx.fillRect(682-5.6*authority, 424, 5.6*authority-2, 72)
-        ctx.fillStyle="#8bc34a"
-        ctx.fillRect(120, 544, 5.6*tradition-2, 72)
-        ctx.fillStyle="#9c27b0"
-        ctx.fillRect(682-5.6*progress, 544, 5.6*progress-2, 72)
-        ctx.fillStyle="#222222"
-        ctx.font="700 80px Montserrat"
-        ctx.textAlign="left"
-        ctx.fillText("3weirdaxes", 20, 90)
-        ctx.font="50px Montserrat"
-        ctx.fillText(ideology, 20, 140)
+    // Images (left column at x=20, right column at x=680)
+    ctx.drawImage(document.getElementById("img-equality"), 20, 170, 100, 100);
+    ctx.drawImage(document.getElementById("img-wealth"), 680, 170, 100, 100);
+    ctx.drawImage(document.getElementById("img-phil1"), 20, 290, 100, 100);
+    ctx.drawImage(document.getElementById("img-phil2"), 680, 290, 100, 100);
+    ctx.drawImage(document.getElementById("img-prog1"), 20, 410, 100, 100);
+    ctx.drawImage(document.getElementById("img-prog2"), 680, 410, 100, 100);
 
-        ctx.textAlign="left"
-        if (equality  > 30) {ctx.fillText(equality + "%", 130, 237.5)}
-        if (might     > 30) {ctx.fillText(might + "%", 130, 357.5)}
-        if (liberty   > 30) {ctx.fillText(liberty + "%", 130, 477.5)}
-        if (tradition > 30) {ctx.fillText(tradition + "%", 130, 597.5)}
-        ctx.textAlign="right"
-        if (wealth    > 30) {ctx.fillText(wealth + "%", 670, 237.5)}
-        if (peace     > 30) {ctx.fillText(peace + "%", 670, 357.5)}
-        if (authority > 30) {ctx.fillText(authority + "%", 670, 477.5)}
-        if (progress  > 30) {ctx.fillText(progress + "%", 670, 597.5)}
+    // Bar backgrounds
+    ctx.fillStyle = "#222222";
+    [180, 300, 420].forEach(y => ctx.fillRect(120, y, 560, 80));
 
-        ctx.font="300 30px Montserrat"
-        ctx.fillText("3weirdaxes.github.io", 780, 60)
-		ctx.fillText(version, 780, 90)
-        ctx.textAlign="center"
-        ctx.fillText("Economic Axis: " + document.getElementById("economic-label").innerHTML, 400, 175)
-        ctx.fillText("Diplomatic Axis: " + document.getElementById("diplomatic-label").innerHTML, 400, 295)
-        ctx.fillText("Civil Axis: " + document.getElementById("state-label").innerHTML, 400, 415)
-        ctx.fillText("Societal Axis: " + document.getElementById("society-label").innerHTML, 400, 535)
+    // Colored bar fills
+    ctx.fillStyle = "#f44336"; ctx.fillRect(120, 184, 5.6 * equality - 2, 72);
+    ctx.fillStyle = "#00897b"; ctx.fillRect(682 - 5.6 * wealth, 184, 5.6 * wealth - 2, 72);
+    ctx.fillStyle = "#ffeb3b"; ctx.fillRect(120, 304, 5.6 * phil - 2, 72);
+    ctx.fillStyle = "#3f51b5"; ctx.fillRect(682 - 5.6 * philOpp, 304, 5.6 * philOpp - 2, 72);
+    ctx.fillStyle = "#9c27b0"; ctx.fillRect(120, 424, 5.6 * prog - 2, 72);
+    ctx.fillStyle = "#8bc34a"; ctx.fillRect(682 - 5.6 * progOpp, 424, 5.6 * progOpp - 2, 72);
 
-        document.getElementById("banner").src = c.toDataURL();
-    }
+    // Title and matched ideology
+    ctx.fillStyle = "#222222";
+    ctx.font = "700 60px Montserrat";
+    ctx.textAlign = "left";
+    ctx.fillText("3weirdaxes", 20, 80);
+    ctx.font = "40px Montserrat";
+    ctx.fillText(ideology, 20, 130);
+
+    // Percentage labels on the bars
+    ctx.font = "32px Montserrat";
+    ctx.textAlign = "left";
+    if (equality > 30) { ctx.fillText(equality + "%", 130, 237.5) }
+    if (phil > 30) { ctx.fillText(phil + "%", 130, 357.5) }
+    if (prog > 30) { ctx.fillText(prog + "%", 130, 477.5) }
+    ctx.textAlign = "right";
+    if (wealth > 30) { ctx.fillText(wealth + "%", 670, 237.5) }
+    if (philOpp > 30) { ctx.fillText(philOpp + "%", 670, 357.5) }
+    if (progOpp > 30) { ctx.fillText(progOpp + "%", 670, 477.5) }
+
+    // Branding, top right
+    ctx.font = "300 24px Montserrat";
+    ctx.textAlign = "right";
+    ctx.fillText("3weirdaxes.github.io", 780, 50);
+    ctx.fillText(version, 780, 78);
+
+    // Axis name + label, centered above each bar
+    ctx.textAlign = "center";
+    ctx.fillText("Economic Axis: " + document.getElementById("economic-label").innerHTML, 400, 175);
+    ctx.fillText("Philosophical Axis: " + document.getElementById("phil-label").innerHTML, 400, 295);
+    ctx.fillText("Progressive Axis: " + document.getElementById("prog-label").innerHTML, 400, 415);
+
+    document.getElementById("banner").src = c.toDataURL();
+}
     </script>
 </body>
