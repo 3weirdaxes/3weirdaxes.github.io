@@ -3,7 +3,6 @@
 //   cultural  : Progress <-> Tradition     (Progressive/Conservative)
 //   worldview : Liberty  <-> Authority     (matches the Philosophical axis)
 ideologies = [
-            "econ": 100,
     { "name": "Anarcho-Communism", "stats": { "economics": 100, "cultural": 90, "worldview": 75 } },
     { "name": "Libertarian Communism", "stats": { "economics": 100, "cultural": 80, "worldview": 75 } },
     { "name": "Trotskyism", "stats": { "economics": 100, "cultural": 80, "worldview": 80 } },
